@@ -1,0 +1,38 @@
+// Attribute calculation rule that populates the "Alcohol Suspected" field 
+// with a default value of "No" unless the value returned from
+// an in-memory concatenation of the “TU1 Alcohol Suspected” 
+// or TU2 Alcohol Suspected" fields contain the characters "Yes". 
+// Then, the value “Yes" will be returned. 
+
+// Default value
+var defaultVal = "No";
+
+// Retrieve the values for TU1 and TU2, ensuring they are not null
+var tu1 = $feature.TU1_ALCOHOL_SUSPECTED;
+if (IsEmpty(tu1)) {
+    tu1 = "";
+}
+
+var tu2 = $feature.TU2_ALCOHOL_SUSPECTED;
+if (IsEmpty(tu2)) {
+    tu2 = "";
+}
+
+// Combine TU1 and TU2 into a single in-memory string
+var combinedString = Concatenate(tu1, tu2);
+
+// Function to check for "yes" (case-insensitive)
+function containsYes(value) {
+    // Convert the string to lowercase for case-insensitive comparison
+    var normalizedValue = Lower(value);
+
+    // Check if the string contains "yes"
+    return Find("yes", normalizedValue) != -1;
+}
+
+// Evaluate the combined string
+if (containsYes(combinedString)) {
+    return "Yes"; // Return "Yes" if conditions are met
+} else {
+    return "No";  // Return "No" as the default
+}

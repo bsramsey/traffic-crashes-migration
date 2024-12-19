@@ -1,0 +1,18 @@
+// Attribute calculation rule that concatenates the "TU1 Most Severe Injury" 
+// and "TU2 Most Severe Injury" fields and populates the "Injury Severity" field. 
+// If either field is null or contains the value "NA", the "Injury Severity" field 
+// is populated with "00. No Apparent Injury".
+
+// Retrieve and handle null, blank, or "NA" values for TU1 and TU2
+var tu1 = $feature.TU1_MOST_SEVERE_INJURY;
+var tu2 = $feature.TU2_MOST_SEVERE_INJURY;
+
+// Set default values for null, blank, or "NA" inputs to "00. No Apparent Injury"
+tu1 = IIf(IsEmpty(tu1) || tu1 == "" || tu1 == "NA", "00. No Apparent Injury", tu1);
+tu2 = IIf(IsEmpty(tu2) || tu2 == "" || tu2 == "NA", "00. No Apparent Injury", tu2);
+
+// Concatenate TU1 and TU2 with a comma and space
+var injurySeverity = tu1 + ", " + tu2;
+
+// Return the concatenated result to populate the "Injury Severity" field
+return injurySeverity;

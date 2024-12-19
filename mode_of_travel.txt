@@ -1,0 +1,47 @@
+// Attribute calculation rule identifying crashes involving bicycles, pedestrians, 
+// motorcycles, and scooters. It checks the “TU1 Unit Type,” “TU2 Unit Type,” 
+// “TU1 Non-Motorist Type,” and “TU2 Non-Motorist Type” fields for bicycles, 
+// pedestrians, and scooters. It also checks the “TU1 Vehicle Type” and 
+// “TU2 Vehicle Type” fields for motorcycles. All other crashes are categorized 
+// as vehicle crashes. 
+
+// Convert TU1_NON_MOTORIST_TYPE and TU2_NON_MOTORIST_TYPE to lowercase for case-insensitive comparison
+var tu1_non_motorist_type = Lower($feature.TU1_NON_MOTORIST_TYPE);
+var tu2_non_motorist_type = Lower($feature.TU2_NON_MOTORIST_TYPE);
+
+// Convert "NA" to lowercase for comparison
+var na_value = "na";
+
+// Define the keywords
+var keyword1 = "pedestrian";
+var keyword2 = "scooter";
+var keyword3 = "bicyclist";
+
+// Initialize the result values
+var result_tu1 = "";
+var result_tu2 = "";
+
+// Check TU1_NON_MOTORIST_TYPE
+if (tu1_non_motorist_type == na_value) {
+    result_tu1 = $feature.TU1_VEHICLE_TYPE; // If TU1 is "NA", use TU1_VEHICLE_TYPE
+} else if (Find(keyword1, tu1_non_motorist_type) != -1 || 
+           Find(keyword2, tu1_non_motorist_type) != -1 || 
+           Find(keyword3, tu1_non_motorist_type) != -1) {
+    result_tu1 = $feature.TU1_NON_MOTORIST_TYPE; // If TU1 contains a keyword, use TU1_NON_MOTORIST_TYPE
+} else {
+    result_tu1 = $feature.TU1_VEHICLE_TYPE; // Default to TU1_VEHICLE_TYPE if neither of the above
+}
+
+// Check TU2_NON_MOTORIST_TYPE
+if (tu2_non_motorist_type == na_value) {
+    result_tu2 = $feature.TU2_VEHICLE_TYPE; // If TU2 is "NA", use TU2_VEHICLE_TYPE
+} else if (Find(keyword1, tu2_non_motorist_type) != -1 || 
+           Find(keyword2, tu2_non_motorist_type) != -1 || 
+           Find(keyword3, tu2_non_motorist_type) != -1) {
+    result_tu2 = $feature.TU2_NON_MOTORIST_TYPE; // If TU2 contains a keyword, use TU2_NON_MOTORIST_TYPE
+} else {
+    result_tu2 = $feature.TU2_VEHICLE_TYPE; // Default to TU2_VEHICLE_TYPE if neither of the above
+}
+
+// Return the concatenated result
+return result_tu1 + ", " + result_tu2;

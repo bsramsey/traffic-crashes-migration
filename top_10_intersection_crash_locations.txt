@@ -1,0 +1,52 @@
+if ($rowindex <= 10){
+  return {
+  cells: {
+    INTERSECTION_NAME: {
+      displayText : $datapoint.INTERSECTION_NAME,
+      textColor: '#ffffff',
+      backgroundColor: '#DD5F13',
+      textAlign: 'left',
+      iconName: 'car',
+      iconAlign: '',
+      iconColor: '',
+      iconOutlineColor: ''
+    },
+		
+    count_OBJECTID: {
+      displayText : Text($datapoint.count_OBJECTID),
+      textColor: '#ffffff',
+      backgroundColor: '#DD5F13',
+      textAlign: 'right',
+      iconName: '',
+      iconAlign: '',
+      iconColor: '',
+      iconOutlineColor: ''
+    }
+  }
+}
+}
+return {
+  cells: {
+    INTERSECTION_NAME: {
+      displayText : $datapoint.INTERSECTION_NAME,
+      textColor: '',
+      backgroundColor: '',
+      textAlign: 'left',
+      iconName: '',
+      iconAlign: '',
+      iconColor: '',
+      iconOutlineColor: ''
+    },
+		
+    count_OBJECTID: {
+      displayText : Text($datapoint.count_OBJECTID),
+      textColor: '',
+      backgroundColor: '',
+      textAlign: 'right',
+      iconName: '',
+      iconAlign: '',
+      iconColor: '',
+      iconOutlineColor: ''
+    }
+  }
+}
