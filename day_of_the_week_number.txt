@@ -1,0 +1,5 @@
+// Extract only the date portion from ACCIDENT_DATETIME
+var crashDate = DateOnly($feature.ACCIDENT_DATETIME);
+
+// Format the date to display the day of the week (1-7)
+return Text(crashDate, "d")
