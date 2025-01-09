@@ -3,7 +3,7 @@
 // “TU1 Non-Motorist Type,” and “TU2 Non-Motorist Type” fields for bicycles, 
 // pedestrians, and scooters. It also checks the “TU1 Vehicle Type” and 
 // “TU2 Vehicle Type” fields for motorcycles. All other crashes are categorized 
-// as vehicle crashes. 
+// as motor vehicle crashes. 
 
 // Convert TU1_NON_MOTORIST_TYPE and TU2_NON_MOTORIST_TYPE to lowercase for case-insensitive comparison
 var tu1_non_motorist_type = Lower($feature.TU1_NON_MOTORIST_TYPE);
@@ -12,36 +12,60 @@ var tu2_non_motorist_type = Lower($feature.TU2_NON_MOTORIST_TYPE);
 // Convert "NA" to lowercase for comparison
 var na_value = "na";
 
-// Define the keywords
-var keyword1 = "pedestrian";
-var keyword2 = "scooter";
-var keyword3 = "bicyclist";
+// Define the keywords in order of priority (with capitalized return values)
+var keyword1 = { keyword: "Pedestrian", priority: 1 };
+var keyword2 = { keyword: "Scooter", priority: 2 };
+var keyword3 = { keyword: "Bicyclist", priority: 3 };
+var keyword4 = { keyword: "Motorcycle", priority: 4 };
+var default_keyword = { keyword: "Motor Vehicle", priority: 5 };
 
-// Initialize the result values
-var result_tu1 = "";
-var result_tu2 = "";
-
-// Check TU1_NON_MOTORIST_TYPE
-if (tu1_non_motorist_type == na_value) {
-    result_tu1 = $feature.TU1_VEHICLE_TYPE; // If TU1 is "NA", use TU1_VEHICLE_TYPE
-} else if (Find(keyword1, tu1_non_motorist_type) != -1 || 
-           Find(keyword2, tu1_non_motorist_type) != -1 || 
-           Find(keyword3, tu1_non_motorist_type) != -1) {
-    result_tu1 = $feature.TU1_NON_MOTORIST_TYPE; // If TU1 contains a keyword, use TU1_NON_MOTORIST_TYPE
-} else {
-    result_tu1 = $feature.TU1_VEHICLE_TYPE; // Default to TU1_VEHICLE_TYPE if neither of the above
+// Function to assign priority values and return the corresponding keyword object
+function getPriority(value) {
+    // Check if the value contains the keyword in a case-insensitive manner
+    if (Find(Lower(keyword1.keyword), value) != -1) {
+        return keyword1;
+    } else if (Find(Lower(keyword2.keyword), value) != -1) {
+        return keyword2;
+    } else if (Find(Lower(keyword3.keyword), value) != -1) {
+        return keyword3;
+    } else if (Find(Lower(keyword4.keyword), value) != -1) {
+        return keyword4;
+    } else {
+        return null; // Do not assign default here
+    }
 }
 
-// Check TU2_NON_MOTORIST_TYPE
-if (tu2_non_motorist_type == na_value) {
-    result_tu2 = $feature.TU2_VEHICLE_TYPE; // If TU2 is "NA", use TU2_VEHICLE_TYPE
-} else if (Find(keyword1, tu2_non_motorist_type) != -1 || 
-           Find(keyword2, tu2_non_motorist_type) != -1 || 
-           Find(keyword3, tu2_non_motorist_type) != -1) {
-    result_tu2 = $feature.TU2_NON_MOTORIST_TYPE; // If TU2 contains a keyword, use TU2_NON_MOTORIST_TYPE
-} else {
-    result_tu2 = $feature.TU2_VEHICLE_TYPE; // Default to TU2_VEHICLE_TYPE if neither of the above
+// Determine the TU1 result
+var result_tu1 = null;
+if (tu1_non_motorist_type != na_value) {
+    result_tu1 = getPriority(tu1_non_motorist_type);
+} else if ($feature.TU1_VEHICLE_TYPE != null && $feature.TU1_VEHICLE_TYPE != "") {
+    // Check if "Motorcycle" appears in TU1_VEHICLE_TYPE
+    result_tu1 = getPriority(Lower($feature.TU1_VEHICLE_TYPE));
 }
 
-// Return the concatenated result
-return result_tu1 + ", " + result_tu2;
+// Determine the TU2 result
+var result_tu2 = null;
+if (tu2_non_motorist_type != na_value) {
+    result_tu2 = getPriority(tu2_non_motorist_type);
+} else if ($feature.TU2_VEHICLE_TYPE != null && $feature.TU2_VEHICLE_TYPE != "") {
+    // Check if "Motorcycle" appears in TU2_VEHICLE_TYPE
+    result_tu2 = getPriority(Lower($feature.TU2_VEHICLE_TYPE));
+}
+
+// Assign default values if no priority was found for TU1 or TU2
+if (result_tu1 == null) {
+    result_tu1 = default_keyword;
+}
+if (result_tu2 == null) {
+    result_tu2 = default_keyword;
+}
+
+// Compare priority values and return the capitalized keyword with the highest priority
+if (result_tu1.priority < result_tu2.priority) {
+    return result_tu1.keyword; // TU1 has higher priority
+} else if (result_tu2.priority < result_tu1.priority) {
+    return result_tu2.keyword; // TU2 has higher priority
+} else {
+    return result_tu1.keyword; // If both are equal, return either one
+}
