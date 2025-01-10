@@ -11,8 +11,29 @@ var tu2 = $feature.TU2_MOST_SEVERE_INJURY;
 tu1 = IIf(IsEmpty(tu1) || tu1 == "" || tu1 == "NA", "00. No Apparent Injury", tu1);
 tu2 = IIf(IsEmpty(tu2) || tu2 == "" || tu2 == "NA", "00. No Apparent Injury", tu2);
 
-// Concatenate TU1 and TU2 with a comma and space
-var injurySeverity = tu1 + ", " + tu2;
+// Define a dictionary for the injury levels and their priority order
+var severity = {
+    "00. No Apparent Injury": 0,
+    "01. Possible Injury": 1,
+    "02. Suspected Minor Injury": 2,
+    "03. Suspected Serious Injury": 3,
+    "04. Fatal Injury": 4
+};
 
-// Return the concatenated result to populate the "Injury Severity" field
+// Get the severity levels, defaulting to 0 if the key doesn't exist
+var severityTU1 = IIf(HasKey(severity, tu1), severity[tu1], 0);
+var severityTU2 = IIf(HasKey(severity, tu2), severity[tu2], 0);
+
+// Compare the severity levels and determine the most severe injury
+var injurySeverity = "";
+if (severityTU1 > severityTU2) {
+    injurySeverity = tu1;
+} else if (severityTU2 > severityTU1) {
+    injurySeverity = tu2;
+} else {
+    // If they are the same, default to TU1
+    injurySeverity = tu1;
+}
+
+// Return the result to populate the "Injury Severity" field
 return injurySeverity;
