@@ -18,9 +18,6 @@ if (IsEmpty(tu2)) {
     tu2 = "";
 }
 
-// Combine TU1 and TU2 into a single in-memory string
-var combinedString = Concatenate(tu1, tu2);
-
 // Function to check for "yes" (case-insensitive)
 function containsYes(value) {
     // Convert the string to lowercase for case-insensitive comparison
@@ -30,9 +27,9 @@ function containsYes(value) {
     return Find("yes", normalizedValue) != -1;
 }
 
-// Evaluate the combined string
-if (containsYes(combinedString)) {
-    return "Yes"; // Return "Yes" if conditions are met
+// Evaluate the individual fields and return the result
+if (containsYes(tu1) || containsYes(tu2)) {
+    return "Yes"; // Return "Yes" if either field contains "yes"
 } else {
     return "No";  // Return "No" as the default
 }
